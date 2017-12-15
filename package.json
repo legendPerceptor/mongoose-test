@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha server/**/*.test.js",
     "start": "node app.js"
   },
   "author": "",
@@ -15,5 +15,11 @@
     "mongodb": "^3.0.0-rc0",
     "mongoose": "^4.13.7",
     "yargs": "^10.0.3"
+  },
+  "devDependencies": {
+    "expect": "^21.2.1",
+    "mocha": "^4.0.1",
+    "nodemon": "^1.13.0",
+    "supertest": "^3.0.0"
   }
 }

@@ -1,9 +1,9 @@
 let express=require('express');
 let bodyParser=require('body-parser');
 
-let {mongoose}=require('./server/db/mongoose');
-let {User}=require('./server/models/user');
-let {Todos}=require('./server/models/todos');
+let {mongoose}=require('./db/mongoose');
+let {User}=require('./models/user');
+let {Todos}=require('./models/todos');
 
 let app=express();
 app.use(bodyParser.json());
@@ -23,3 +23,5 @@ app.post('/todos',(req,res)=>{
 app.listen(3000,()=>{
     console.log('Started on port 3000');
 });
+
+module.exports={app};
