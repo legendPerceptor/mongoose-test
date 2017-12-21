@@ -60,6 +60,7 @@ console.log(argv);
 //console.log(argv.d||0+argv.i||0+argv.l||0+argv.u||0);
 if((argv.d||0+argv.i||0+argv.l||0+argv.u||0)!=1)process.exit(0);
 MongoClient.connect('mongodb://127.0.0.1:27017',(err,client)=>{
+    try{
     let db=client.db('QSC_HR');
     assert.equal(null,err);
     console.log('Connected successfully to mongodb server!Authurized access only!');
@@ -112,6 +113,13 @@ MongoClient.connect('mongodb://127.0.0.1:27017',(err,client)=>{
                 HR_writelog(err);
             });
     }
+    }catch(e){
+        HR_writelog(e);
+        console.error('Can\'t connect to database');
+        process.exit(1);
+        //return;
+    }
+    
 
     client.close();
 });
@@ -126,7 +134,7 @@ let createCapped=(db,callback)=>{
 }
 let HR_writelog=(message)=>{
     let time=new Date().toUTCString();
-    let data=time+message;
+    let data=time+message+'\n';
     fs.appendFile('./logs/hr_log.txt',data,(err)=>{
         if(err){console.error('failed to write to hr_log.txt');}
     })
