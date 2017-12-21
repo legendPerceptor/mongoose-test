@@ -1,3 +1,5 @@
+//import { ObjectId } from '../../../../../.cache/typescript/2.6/node_modules/@types/bson';
+
 //import { lchmod } from 'fs';
 
 const expect=require('expect');
@@ -89,6 +91,7 @@ describe('GET /todos/:id',()=>{
             .expect(200)
             .expect((res)=>{
                 //console.log(res.body);
+
                 expect(res.body.todos._id).toEqual(todos[0]._id.toHexString());
             })
             .end(done);
@@ -106,5 +109,49 @@ describe('GET /todos/:id',()=>{
         request(app).get(`/totos/2344`)
             .expect(404).end(done);
             
+    });
+});
+
+describe('DELETE /todos/:id',()=>{
+    it('should remove a todo',(done)=>{
+        request(app)
+            .delete(`/todos/${todos[0]._id}`)
+            .expect(200)
+            .expect((res)=>{
+                console.log(res.body);
+                expect(res.body.todo._id).toEqual(todos[0]._id.toHexString());
+            }).end((err,res)=>{
+                if(err){
+                    return done(err);
+                }
+                Todos.findById(todos[0]._id).then((todo)=>{
+                    expect(todo).toBeFalsy();
+                    done();
+                }).catch((e)=>{
+                    done(e);
+                });
+            });
+        //  expect null 
+    });
+    
+    // it('should get null if findbyid',(done)=>{
+    //     Todos.findById(todos[0]._id).then((todo)=>{
+    //         expect(todo).toNotExist();
+    //         done();
+    //     }).catch((e)=>{
+    //         done(e);
+    //     });
+    // });
+
+    it('should return 404 if todo not found',(done)=>{
+        request(app)
+            .delete(`/toto/${new ObjectID()}`)
+            .expect(404).end(done);
+    });
+
+    it('should return 404 if object id is invalid',(done)=>{
+        request(app)
+            .delete(`/todo/luyuzhousb`)
+            .expect(404).end(done);
     });
 });
