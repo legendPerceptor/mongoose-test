@@ -1,3 +1,13 @@
+let env = process.env.NODE_ENV || 'development';
+console.log('env *****',env);
+if(env==='development'){
+    process.env.PORT=3000;
+    process.env.MONGODB_URI='mongodb://127.0.0.1:27017/Todos';
+}else if(env==='test'){
+    process.env.PORT=3000;
+    process.env.MONGODB_URI='mongodb://127.0.0.1:27017/TodoAppTest';
+}
+
 let express=require('express');
 let bodyParser=require('body-parser');
 let _=require('lodash');
@@ -6,10 +16,31 @@ let {User}=require('./models/user');
 let {Todos}=require('./models/todos');
 let {ObjectID}=require('mongodb');
 
+let {authenticate}=require('./middleware/authenticate');
+
 let app=express();
-const port=process.env.PORT || 3000;
+const port=process.env.PORT;
 
 app.use(bodyParser.json());
+
+app.post('/users',(req,res)=>{
+        let body=_.pick(req.body,['email','password']);
+        let user=new User(body);
+        user.save().then(()=>{
+            return user.generateAuthToken();
+        }).then((token)=>{
+            res.header('x-auth',token).send(user.toJSON());
+        }).catch((e)=>{
+            console.log(e);
+            res.status(400).send(e);
+        })
+
+});
+app.get('/users/me',authenticate,(req,res)=>{
+    res.send(req.user);
+});
+
+
 app.post('/todos',(req,res)=>{
     //console.log(req.body);
     let todo=new Todos({

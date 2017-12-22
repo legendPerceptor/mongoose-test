@@ -1,3 +1,5 @@
+//import { exec } from 'child_process';
+
 //import { ObjectId } from '../../../../../.cache/typescript/2.6/node_modules/@types/bson';
 
 //import { lchmod } from 'fs';
@@ -145,13 +147,46 @@ describe('DELETE /todos/:id',()=>{
 
     it('should return 404 if todo not found',(done)=>{
         request(app)
-            .delete(`/toto/${new ObjectID()}`)
+            .delete(`/todos/${new ObjectID()}`)
             .expect(404).end(done);
     });
 
     it('should return 404 if object id is invalid',(done)=>{
         request(app)
-            .delete(`/todo/luyuzhousb`)
+            .delete(`/todos/luyuzhousb`)
             .expect(404).end(done);
+    });
+});
+
+describe('PATCH /todos/:id',()=>{
+    it('should update the todo',(done)=>{
+        request(app)
+            .patch(`/todos/${todos[1]._id}`)
+            .send({
+                text:"A changed text is sent",
+                completed:true
+            })
+            .expect(200)
+            .expect((res)=>{
+                console.log(res.body);
+                expect(res.body.todo.text).toEqual("A changed text is sent");
+                expect(typeof res.body.todo.completedAt).toBe('number');
+            })
+            .end(done);
+    });
+
+    it('should clear completedAt when todo is not completed',(done)=>{
+        request(app)
+            .patch(`/todos/${todos[0]._id}`)
+            .send({
+                text:"Another update to text! Yet not completed.",
+                completed:false
+            })
+            .expect(200)
+            .expect((res)=>{
+                expect(res.body.todo.text).toEqual("Another update to text! Yet not completed.");
+                expect(res.body.todo.completedAt).toEqual(null);
+            })
+            .end(done);
     });
 });
